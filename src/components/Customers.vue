@@ -51,9 +51,6 @@
         </table>
       </div>
 
-      <div class="data-hint">
-        <strong>🔒 数据隔离提示：</strong>您只能查看和管理由您跟进的客户。
-      </div>
     </div>
 
     <!-- Modal 弹窗：添加/修改客户 -->
@@ -98,9 +95,6 @@
               <div class="form-group" />
             </div>
           </template>
-          <div v-else class="auto-binding-hint">
-            💡 跟进业务员将自动绑定为当前登录账号：<strong>{{ currentUser?.name }}</strong>
-          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeModal">取消</button>
             <button type="submit" class="btn btn-primary">{{ isEditing ? '保存修改' : '确认添加' }}</button>

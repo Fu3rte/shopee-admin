@@ -100,9 +100,6 @@
             </div>
             <div class="form-group" />
           </div>
-          <div class="auto-binding-hint">
-            💡 选择客户后，系统将自动查询该客户的跟进业务员并填入上方字段。
-          </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" @click="closeModal">取消</button>
             <button type="submit" class="btn btn-primary">{{ isEditing ? '保存修改' : '确认添加' }}</button>
