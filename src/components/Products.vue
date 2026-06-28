@@ -11,6 +11,10 @@
             placeholder="输入产品名称查询"
           />
           <button class="btn btn-default" @click="resetSearch">重置</button>
+          <select v-model="filterType" class="filter-select">
+            <option value="">全部类型</option>
+            <option v-for="t in typeList" :key="t" :value="t">{{ t }}</option>
+          </select>
         </div>
         <button class="btn btn-primary" @click="openAddModal">+ 添加产品</button>
       </div>
@@ -22,8 +26,14 @@
             <tr>
               <th>产品名称</th>
               <th>产品类型</th>
-              <th>产品数量</th>
-              <th>产品价格</th>
+              <th class="sortable" @click="sortBy('quantity')">
+                产品数量
+                <span v-if="sortField === 'quantity'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
+              <th class="sortable" @click="sortBy('price')">
+                产品价格
+                <span v-if="sortField === 'price'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
               <th>操作</th>
             </tr>
           </thead>
@@ -90,6 +100,9 @@ import { getProducts, saveProducts } from '../utils/storage.js'
 
 const products = ref([])
 const searchKeyword = ref('')
+const filterType = ref('')
+const sortField = ref('')
+const sortOrder = ref('asc')
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -103,11 +116,46 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
-const filteredProducts = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword) return products.value
-  return products.value.filter(p => p.name.toLowerCase().includes(keyword))
+// 可选的类型列表（用于筛选下拉）
+const typeList = computed(() => {
+  return [...new Set(products.value.map(p => p.type).filter(Boolean))].sort()
 })
+
+const filteredProducts = computed(() => {
+  let result = products.value
+
+  // 按类型筛选
+  if (filterType.value) {
+    result = result.filter(p => p.type === filterType.value)
+  }
+
+  // 按关键字搜索
+  const keyword = searchKeyword.value.trim().toLowerCase()
+  if (keyword) {
+    result = result.filter(p => p.name.toLowerCase().includes(keyword))
+  }
+
+  // 排序
+  if (sortField.value) {
+    result = [...result].sort((a, b) => {
+      const va = Number(a[sortField.value]) || 0
+      const vb = Number(b[sortField.value]) || 0
+      return sortOrder.value === 'asc' ? va - vb : vb - va
+    })
+  }
+
+  return result
+})
+
+// 排序切换
+function sortBy(field) {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+}
 
 onMounted(() => {
   loadProducts()
@@ -181,6 +229,9 @@ function confirmDelete(item) {
 /* ---- 重置搜索 ---- */
 function resetSearch() {
   searchKeyword.value = ''
+  filterType.value = ''
+  sortField.value = ''
+  sortOrder.value = 'asc'
 }
 
 function closeModal() {
