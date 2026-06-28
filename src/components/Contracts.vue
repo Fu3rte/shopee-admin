@@ -13,6 +13,10 @@
           />
           <button class="btn btn-primary" @click="handleSearch">查询</button>
         </div>
+        <select v-model="filterSalesperson" class="filter-select">
+          <option value="">全部业务员</option>
+          <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
+        </select>
         <button class="btn btn-primary" @click="openAddModal">+ 添加合同</button>
       </div>
 
@@ -24,8 +28,14 @@
               <th>客户姓名</th>
               <th>合同名称</th>
               <th>合同内容</th>
-              <th>合同生效日期</th>
-              <th>合同失效日期</th>
+              <th class="sortable" @click="sortBy('startDate')">
+                合同生效日期
+                <span v-if="sortField === 'startDate'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
+              <th class="sortable" @click="sortBy('expiryDate')">
+                合同失效日期
+                <span v-if="sortField === 'expiryDate'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
               <th>状态</th>
               <th>业务员</th>
               <th>操作</th>
@@ -136,12 +146,21 @@ const isAdmin = currentUser?.department === '管理部'
 const allContracts = ref([])
 const displayedContracts = ref([])
 const searchKeyword = ref('')
+const filterSalesperson = ref('')
+const sortField = ref('')
+const sortOrder = ref('asc')
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
 
 // 当前业务员的客户（下拉框用）
 const myCustomers = ref([])
+
+// 可选的业务员列表（用于筛选下拉）
+const salespersonList = computed(() => {
+  const names = [...new Set(displayedContracts.value.map(c => c.salesperson).filter(Boolean))]
+  return names.sort()
+})
 
 // 所有员工（管理员分配业务员用）
 const allEmployees = ref([])
@@ -161,9 +180,29 @@ const defaultForm = () => ({
 const form = ref(defaultForm())
 
 const filteredContracts = computed(() => {
+  let result = displayedContracts.value
+
+  // 按业务员筛选
+  if (filterSalesperson.value) {
+    result = result.filter(c => c.salesperson === filterSalesperson.value)
+  }
+
+  // 按关键字搜索
   const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword) return displayedContracts.value
-  return displayedContracts.value.filter(c => c.name.toLowerCase().includes(keyword))
+  if (keyword) {
+    result = result.filter(c => c.name.toLowerCase().includes(keyword))
+  }
+
+  // 按日期排序
+  if (sortField.value) {
+    result = [...result].sort((a, b) => {
+      const va = a[sortField.value] || ''
+      const vb = b[sortField.value] || ''
+      return sortOrder.value === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    })
+  }
+
+  return result
 })
 
 onMounted(() => {
@@ -198,6 +237,16 @@ function loadMyCustomers() {
 
 function loadEmployees() {
   allEmployees.value = getUsers()
+}
+
+// 排序切换
+function sortBy(field) {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
 }
 
 // 根据日期计算合同状态

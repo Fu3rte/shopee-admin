@@ -13,6 +13,10 @@
           />
           <button class="btn btn-primary" @click="handleSearch">查询</button>
         </div>
+        <select v-model="filterSalesperson" class="filter-select">
+          <option value="">全部业务员</option>
+          <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
+        </select>
         <button class="btn btn-primary" @click="openAddModal">+ 添加售后单</button>
       </div>
 
@@ -122,6 +126,7 @@ const isAdmin = currentUser?.department === '管理部'
 /* ===== 数据 ===== */
 const tickets = ref([])
 const searchKeyword = ref('')
+const filterSalesperson = ref('')
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -144,10 +149,27 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
+// 可选的业务员列表（用于筛选下拉）
+const salespersonList = computed(() => {
+  const names = [...new Set(tickets.value.map(t => t.salesperson).filter(Boolean))]
+  return names.sort()
+})
+
 const filteredTickets = computed(() => {
+  let result = tickets.value
+
+  // 按业务员筛选
+  if (filterSalesperson.value) {
+    result = result.filter(t => t.salesperson === filterSalesperson.value)
+  }
+
+  // 按关键字搜索
   const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword) return tickets.value
-  return tickets.value.filter(t => t.customerName.toLowerCase().includes(keyword))
+  if (keyword) {
+    result = result.filter(t => t.customerName.toLowerCase().includes(keyword))
+  }
+
+  return result
 })
 
 onMounted(() => {
