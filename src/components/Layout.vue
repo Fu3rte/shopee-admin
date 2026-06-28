@@ -68,7 +68,6 @@
           <button class="modal-close" @click="closeProfile">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="profile-avatar">{{ user.name?.charAt(0) }}</div>
           <table class="profile-table">
             <tr><td class="profile-label">姓名</td><td>{{ user.name }}</td></tr>
             <tr><td class="profile-label">性别</td><td>{{ user.gender }}</td></tr>
