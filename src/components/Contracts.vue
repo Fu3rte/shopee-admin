@@ -12,7 +12,7 @@
             @input="handleSearch"
           />
           <button class="btn btn-primary" @click="handleSearch">查询</button>
-          <select v-model="filterSalesperson" class="filter-select">
+          <select v-if="isAdmin" v-model="filterSalesperson" class="filter-select">
             <option value="">全部业务员</option>
             <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
           </select>

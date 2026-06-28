@@ -159,3 +159,51 @@
   padding: 24px;
   overflow-y: auto;
 }
+
+/* 个人信息弹窗 */
+.profile-modal {
+  max-width: 400px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #0052ff;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.profile-table tr {
+  border-bottom: 1px solid #eef0f3;
+}
+
+.profile-table tr:last-child {
+  border-bottom: none;
+}
+
+.profile-table td {
+  padding: 10px 8px;
+}
+
+.profile-label {
+  font-weight: 600;
+  color: #0a0b0d;
+  width: 80px;
+  white-space: nowrap;
+}
+
+.profile-table td:last-child {
+  color: #5b616e;
+}

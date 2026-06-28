@@ -46,7 +46,7 @@
           <span class="header-title">{{ pageTitle }}</span>
         </div>
         <div class="header-right">
-          <span class="user-info">
+          <span class="user-info" @click="openProfile" style="cursor:pointer">
             <span class="user-avatar">👤</span>
             <span class="user-name">{{ user.name }}</span>
             <span class="user-position">（{{ user.position }}）</span>
@@ -58,6 +58,30 @@
       <main class="content">
         <router-view />
       </main>
+    </div>
+
+    <!-- 个人信息弹窗 -->
+    <div v-if="showProfile" class="modal-overlay" @click.self="closeProfile">
+      <div class="modal-card profile-modal">
+        <div class="modal-header">
+          <h3>个人信息</h3>
+          <button class="modal-close" @click="closeProfile">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="profile-avatar">{{ user.name?.charAt(0) }}</div>
+          <table class="profile-table">
+            <tr><td class="profile-label">姓名</td><td>{{ user.name }}</td></tr>
+            <tr><td class="profile-label">性别</td><td>{{ user.gender }}</td></tr>
+            <tr><td class="profile-label">年龄</td><td>{{ user.age }}</td></tr>
+            <tr><td class="profile-label">学历</td><td>{{ user.education }}</td></tr>
+            <tr><td class="profile-label">部门</td><td>{{ user.department }}</td></tr>
+            <tr><td class="profile-label">职务</td><td>{{ user.position }}</td></tr>
+            <tr><td class="profile-label">入职时间</td><td>{{ user.hireDate }}</td></tr>
+            <tr><td class="profile-label">工资</td><td>{{ user.salary }}</td></tr>
+            <tr><td class="profile-label">用户名</td><td>{{ user.username }}</td></tr>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -71,6 +95,7 @@ const route = useRoute()
 
 const userStr = localStorage.getItem('shopee_current_user')
 const user = ref(userStr ? JSON.parse(userStr) : {})
+const showProfile = ref(false)
 
 // 页面标题映射
 const titleMap = {
@@ -86,6 +111,14 @@ const pageTitle = computed(() => titleMap[route.path] || 'Dashboard')
 function handleLogout() {
   localStorage.removeItem('shopee_current_user')
   router.push('/login')
+}
+
+function openProfile() {
+  showProfile.value = true
+}
+
+function closeProfile() {
+  showProfile.value = false
 }
 </script>
 
