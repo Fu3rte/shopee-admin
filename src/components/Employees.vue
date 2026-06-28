@@ -9,9 +9,8 @@
             type="text"
             class="search-input"
             placeholder="输入员工姓名查询"
-            @input="handleSearch"
           />
-          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="resetSearch">重置</button>
           <select v-model="filterDepartment" class="filter-select">
             <option value="">全部部门</option>
             <option v-for="d in departmentList" :key="d" :value="d">{{ d }}</option>
@@ -341,6 +340,15 @@ function confirmDelete(emp) {
   employees.value = employees.value.filter(e => e.id !== emp.id)
   saveUsers(employees.value)
   alert('删除成功')
+}
+
+/* ---- 重置搜索与筛选 ---- */
+function resetSearch() {
+  searchKeyword.value = ''
+  filterDepartment.value = ''
+  filterEducation.value = ''
+  sortField.value = ''
+  sortOrder.value = 'asc'
 }
 
 function closeModal() {

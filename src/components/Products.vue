@@ -9,9 +9,8 @@
             type="text"
             class="search-input"
             placeholder="输入产品名称查询"
-            @input="handleSearch"
           />
-          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="resetSearch">重置</button>
         </div>
         <button class="btn btn-primary" @click="openAddModal">+ 添加产品</button>
       </div>
@@ -177,6 +176,11 @@ function confirmDelete(item) {
   products.value = products.value.filter(p => p.id !== item.id)
   saveProducts(products.value)
   alert('删除成功')
+}
+
+/* ---- 重置搜索 ---- */
+function resetSearch() {
+  searchKeyword.value = ''
 }
 
 function closeModal() {

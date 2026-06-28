@@ -9,9 +9,8 @@
             type="text"
             class="search-input"
             placeholder="输入合同名称查询"
-            @input="handleSearch"
           />
-          <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <button class="btn btn-default" @click="resetSearch">重置</button>
           <select v-if="isAdmin" v-model="filterSalesperson" class="filter-select">
             <option value="">全部业务员</option>
             <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
@@ -333,6 +332,14 @@ function confirmDelete(item) {
   saveContracts(allContracts.value)
   loadContracts()
   alert('删除成功')
+}
+
+/* ---- 重置搜索与筛选 ---- */
+function resetSearch() {
+  searchKeyword.value = ''
+  filterSalesperson.value = ''
+  sortField.value = ''
+  sortOrder.value = 'asc'
 }
 
 function closeModal() {
