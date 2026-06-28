@@ -12,7 +12,7 @@
           />
           <button class="btn btn-default" @click="resetSearch">重置</button>
           <select v-if="isAdmin" v-model="filterSalesperson" class="filter-select">
-            <option value="">全部业务员</option>
+            <option value="">全部售后员</option>
             <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
           </select>
         </div>
@@ -27,7 +27,7 @@
               <th>客户姓名</th>
               <th>客户反馈意见</th>
               <th>状态</th>
-              <th>业务员</th>
+              <th>售后员</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -61,7 +61,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>客户姓名 <span class="required">*</span></label>
-              <select v-model="form.customerName" required @change="onCustomerChange">
+              <select v-model="form.customerName" required>
                 <option value="">请选择客户</option>
                 <option v-for="c in availableCustomers" :key="c.id" :value="c.name">
                   {{ c.name }}
@@ -70,9 +70,9 @@
             </div>
             <template v-if="isAdmin">
               <div class="form-group">
-                <label>分配业务员 <span class="required">*</span></label>
+                <label>分配售后员 <span class="required">*</span></label>
                 <select v-model="form.salesperson" required>
-                  <option value="">请选择业务员</option>
+                  <option value="">请选择售后员</option>
                   <option v-for="emp in serviceEmployees" :key="emp.id" :value="emp.name">
                     {{ emp.name }}
                   </option>
@@ -80,7 +80,7 @@
               </div>
             </template>
             <div v-else class="form-group">
-              <label>业务员（自动带出）</label>
+              <label>售后员（自动带出）</label>
               <input type="text" :value="form.salesperson" disabled class="auto-field" />
             </div>
           </div>
@@ -202,12 +202,6 @@ function loadAllCustomers() {
 
 function loadEmployees() {
   allEmployees.value = getUsers()
-}
-
-/** 选择客户时自动查找 salesperson 并填入表单 */
-function onCustomerChange() {
-  const selected = allCustomers.value.find(c => c.name === form.value.customerName)
-  form.value.salesperson = selected ? selected.salesperson : ''
 }
 
 /* ---- 添加 ---- */
