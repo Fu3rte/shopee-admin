@@ -111,7 +111,13 @@ import { getCustomers, saveCustomers, getUsers } from '../utils/storage.js'
 
 /* ===== 当前用户 ===== */
 const userStr = localStorage.getItem('shopee_current_user')
-const currentUser = userStr ? JSON.parse(userStr) : null
+let currentUserData = null
+try {
+  currentUserData = userStr ? JSON.parse(userStr) : null
+} catch (e) {
+  currentUserData = null
+}
+const currentUser = currentUserData
 const isAdmin = currentUser?.department === '管理部'
 
 /* ===== 数据 ===== */

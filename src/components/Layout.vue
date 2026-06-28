@@ -93,7 +93,13 @@ const router = useRouter()
 const route = useRoute()
 
 const userStr = localStorage.getItem('shopee_current_user')
-const user = ref(userStr ? JSON.parse(userStr) : {})
+let userData = {}
+try {
+  userData = userStr ? JSON.parse(userStr) : {}
+} catch (e) {
+  userData = {}
+}
+const user = ref(userData)
 const showProfile = ref(false)
 
 // 页面标题映射

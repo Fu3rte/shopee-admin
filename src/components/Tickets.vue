@@ -116,11 +116,18 @@ import { getTickets, saveTickets, getCustomers, getUsers } from '../utils/storag
 
 // 当前用户
 const userStr = localStorage.getItem('shopee_current_user')
-const currentUser = userStr ? JSON.parse(userStr) : null
+let currentUserData = null
+try {
+  currentUserData = userStr ? JSON.parse(userStr) : null
+} catch (e) {
+  currentUserData = null
+}
+const currentUser = currentUserData
 const isAdmin = currentUser?.department === '管理部'
 
 /* ===== 数据 ===== */
-const tickets = ref([])
+const allTickets = ref([])    // 全部售后单（用于保存时写回完整列表）
+const tickets = ref([])       // 当前角色可见的售后单
 const searchKeyword = ref('')
 const filterSalesperson = ref('')
 const showModal = ref(false)
@@ -130,9 +137,9 @@ const editingId = ref(null)
 // 全部客户（下拉框用）
 const allCustomers = ref([])
 
-// 可选客户（过滤掉已有售后单的客户）
+// 可选客户（过滤掉已有售后单的客户，使用全局列表判断）
 const availableCustomers = computed(() => {
-  const assignedNames = new Set(tickets.value.map(t => t.customerName))
+  const assignedNames = new Set(allTickets.value.map(t => t.customerName))
   // 编辑模式下，当前客户仍需可选
   if (isEditing.value && form.value.customerName) {
     assignedNames.delete(form.value.customerName)
@@ -187,6 +194,7 @@ onMounted(() => {
 /* ===== 方法 ===== */
 function loadTickets() {
   const all = getTickets()
+  allTickets.value = all
   if (isAdmin) {
     tickets.value = all
   } else if (currentUser) {
@@ -239,15 +247,16 @@ function saveTicket() {
   }
 
   if (isEditing.value) {
-    const index = tickets.value.findIndex(t => t.id === editingId.value)
+    const index = allTickets.value.findIndex(t => t.id === editingId.value)
     if (index !== -1) {
-      tickets.value[index] = data
+      allTickets.value[index] = data
     }
   } else {
-    tickets.value.push(data)
+    allTickets.value.push(data)
   }
 
-  saveTickets(tickets.value)
+  saveTickets(allTickets.value)
+  loadTickets()
   showModal.value = false
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
@@ -262,8 +271,9 @@ function confirmDelete(item) {
     return
   }
 
-  tickets.value = tickets.value.filter(t => t.id !== item.id)
-  saveTickets(tickets.value)
+  allTickets.value = allTickets.value.filter(t => t.id !== item.id)
+  saveTickets(allTickets.value)
+  loadTickets()
   alert('删除成功')
 }
 
