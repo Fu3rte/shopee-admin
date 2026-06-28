@@ -62,7 +62,19 @@ router.beforeEach((to, from, next) => {
   }
 
   if (isLoggedIn && to.path === '/login') {
-    return next('/')
+    // 根据用户部门跳转对应首页，而非固定 /employees（避免非管理部用户循环）
+    try {
+      const user = JSON.parse(userStr)
+      const departmentRouteMap = {
+        '管理部': '/employees',
+        '业务部': '/customers',
+        '产品部': '/products',
+        '售后部': '/tickets'
+      }
+      return next(departmentRouteMap[user.department] || '/employees')
+    } catch {
+      return next('/employees')
+    }
   }
 
   if (isLoggedIn && to.meta.departments) {

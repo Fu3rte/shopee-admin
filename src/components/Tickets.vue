@@ -229,6 +229,13 @@ watch([searchKeyword, filterSalesperson], () => {
   currentPage.value = 1
 })
 
+// 数据变化时确保 currentPage 不越界
+watch(totalPages, (newTotal) => {
+  if (currentPage.value > newTotal) {
+    currentPage.value = newTotal
+  }
+})
+
 function prevPage() {
   if (currentPage.value > 1) currentPage.value--
 }
@@ -297,6 +304,7 @@ function confirmDelete(item) {
 function resetSearch() {
   searchKeyword.value = ''
   filterSalesperson.value = ''
+  currentPage.value = 1
 }
 
 function closeModal() {

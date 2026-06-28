@@ -189,6 +189,13 @@ watch([searchKeyword, filterType, sortField], () => {
   currentPage.value = 1
 })
 
+// 数据变化时确保 currentPage 不越界
+watch(totalPages, (newTotal) => {
+  if (currentPage.value > newTotal) {
+    currentPage.value = newTotal
+  }
+})
+
 function prevPage() {
   if (currentPage.value > 1) currentPage.value--
 }
@@ -262,6 +269,7 @@ function resetSearch() {
   filterType.value = ''
   sortField.value = ''
   sortOrder.value = 'asc'
+  currentPage.value = 1
 }
 
 function closeModal() {
