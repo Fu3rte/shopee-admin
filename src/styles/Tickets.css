@@ -47,6 +47,25 @@
   color: #5b616e;
 }
 
+.filter-select {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #dee1e6;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0a0b0d;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 130px;
+}
+
+.filter-select:focus {
+  border-color: #0052ff;
+  box-shadow: 0 0 0 2px rgba(0, 82, 255, 0.15);
+}
+
 .btn {
   height: 40px;
   padding: 0 20px;
