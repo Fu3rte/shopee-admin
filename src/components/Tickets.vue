@@ -63,7 +63,7 @@
               <label>客户姓名 <span class="required">*</span></label>
               <select v-model="form.customerName" required @change="onCustomerChange">
                 <option value="">请选择客户</option>
-                <option v-for="c in allCustomers" :key="c.id" :value="c.name">
+                <option v-for="c in availableCustomers" :key="c.id" :value="c.name">
                   {{ c.name }}
                 </option>
               </select>
@@ -132,6 +132,16 @@ const editingId = ref(null)
 
 // 全部客户（下拉框用）
 const allCustomers = ref([])
+
+// 可选客户（过滤掉已有售后单的客户）
+const availableCustomers = computed(() => {
+  const assignedNames = new Set(tickets.value.map(t => t.customerName))
+  // 编辑模式下，当前客户仍需可选
+  if (isEditing.value && form.value.customerName) {
+    assignedNames.delete(form.value.customerName)
+  }
+  return allCustomers.value.filter(c => !assignedNames.has(c.name))
+})
 
 // 所有员工（管理员分配业务员用）
 const allEmployees = ref([])
