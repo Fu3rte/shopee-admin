@@ -12,6 +12,14 @@
             @input="handleSearch"
           />
           <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <select v-model="filterDepartment" class="filter-select">
+            <option value="">全部部门</option>
+            <option v-for="d in departmentList" :key="d" :value="d">{{ d }}</option>
+          </select>
+          <select v-model="filterEducation" class="filter-select">
+            <option value="">全部学历</option>
+            <option v-for="e in educationList" :key="e" :value="e">{{ e }}</option>
+          </select>
         </div>
         <button class="btn btn-primary" @click="openAddModal">+ 添加员工</button>
       </div>
@@ -23,12 +31,21 @@
             <tr>
               <th>姓名</th>
               <th>性别</th>
-              <th>年龄</th>
+              <th class="sortable" @click="sortBy('age')">
+                年龄
+                <span v-if="sortField === 'age'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
               <th>学历</th>
               <th>部门</th>
-              <th>入职时间</th>
+              <th class="sortable" @click="sortBy('hireDate')">
+                入职时间
+                <span v-if="sortField === 'hireDate'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
               <th>职务</th>
-              <th>工资</th>
+              <th class="sortable" @click="sortBy('salary')">
+                工资
+                <span v-if="sortField === 'salary'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+              </th>
               <th>操作</th>
             </tr>
           </thead>
@@ -147,6 +164,10 @@ import { getUsers, saveUsers } from '../utils/storage.js'
 
 const employees = ref([])
 const searchKeyword = ref('')
+const filterDepartment = ref('')
+const filterEducation = ref('')
+const sortField = ref('')
+const sortOrder = ref('asc')
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -178,11 +199,64 @@ function onDepartmentChange() {
   form.value.position = departmentPositionMap[form.value.department] || ''
 }
 
-const filteredEmployees = computed(() => {
-  const keyword = searchKeyword.value.trim().toLowerCase()
-  if (!keyword) return employees.value
-  return employees.value.filter(emp => emp.name.toLowerCase().includes(keyword))
+// 可选的部门列表（用于筛选下拉）
+const departmentList = computed(() => {
+  return [...new Set(employees.value.map(e => e.department).filter(Boolean))].sort()
 })
+
+// 可选的学历列表（用于筛选下拉）
+const educationList = computed(() => {
+  return [...new Set(employees.value.map(e => e.education).filter(Boolean))].sort()
+})
+
+const filteredEmployees = computed(() => {
+  let result = employees.value
+
+  // 按部门筛选
+  if (filterDepartment.value) {
+    result = result.filter(e => e.department === filterDepartment.value)
+  }
+
+  // 按学历筛选
+  if (filterEducation.value) {
+    result = result.filter(e => e.education === filterEducation.value)
+  }
+
+  // 按关键字搜索
+  const keyword = searchKeyword.value.trim().toLowerCase()
+  if (keyword) {
+    result = result.filter(emp => emp.name.toLowerCase().includes(keyword))
+  }
+
+  // 排序
+  if (sortField.value) {
+    result = [...result].sort((a, b) => {
+      let va = a[sortField.value]
+      let vb = b[sortField.value]
+      if (sortField.value === 'salary' || sortField.value === 'age') {
+        va = Number(va) || 0
+        vb = Number(vb) || 0
+        return sortOrder.value === 'asc' ? va - vb : vb - va
+      }
+      // 日期或字符串排序
+      va = va || ''
+      vb = vb || ''
+      return sortOrder.value === 'asc' ? va.toString().localeCompare(vb.toString()) : vb.toString().localeCompare(va.toString())
+    })
+  }
+
+  return result
+})
+
+// 排序切换
+function sortBy(field) {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortOrder.value = 'asc'
+  }
+}
 
 onMounted(() => {
   loadEmployees()

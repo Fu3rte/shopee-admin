@@ -12,11 +12,11 @@
             @input="handleSearch"
           />
           <button class="btn btn-primary" @click="handleSearch">查询</button>
+          <select v-model="filterSalesperson" class="filter-select">
+            <option value="">全部业务员</option>
+            <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
+          </select>
         </div>
-        <select v-model="filterSalesperson" class="filter-select">
-          <option value="">全部业务员</option>
-          <option v-for="s in salespersonList" :key="s" :value="s">{{ s }}</option>
-        </select>
         <button class="btn btn-primary" @click="openAddModal">+ 添加合同</button>
       </div>
 
