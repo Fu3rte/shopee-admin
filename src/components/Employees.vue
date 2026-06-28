@@ -52,7 +52,7 @@
             <tr v-if="filteredEmployees.length === 0">
               <td colspan="9" class="empty-row">暂无数据</td>
             </tr>
-            <tr v-for="emp in filteredEmployees" :key="emp.id">
+            <tr v-for="emp in pagedEmployees" :key="emp.id">
               <td>{{ emp.name }}</td>
               <td>{{ emp.gender }}</td>
               <td>{{ emp.age }}</td>
@@ -68,6 +68,13 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+        <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
+        <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
       </div>
     </div>
 
@@ -158,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { getUsers, saveUsers } from '../utils/storage.js'
 
 const employees = ref([])
@@ -167,6 +174,17 @@ const filterDepartment = ref('')
 const filterEducation = ref('')
 const sortField = ref('')
 const sortOrder = ref('asc')
+
+/* ===== 分页 ===== */
+const pageSize = 10
+const currentPage = ref(1)
+
+const pagedEmployees = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredEmployees.value.slice(start, start + pageSize)
+})
+const totalPages = computed(() => Math.ceil(filteredEmployees.value.length / pageSize) || 1)
+
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -342,6 +360,18 @@ function confirmDelete(emp) {
   alert('删除成功')
 }
 
+// 筛选条件变化时回到第一页
+watch([searchKeyword, filterDepartment, filterEducation, sortField], () => {
+  currentPage.value = 1
+})
+
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+
 /* ---- 重置搜索与筛选 ---- */
 function resetSearch() {
   searchKeyword.value = ''
@@ -349,6 +379,7 @@ function resetSearch() {
   filterEducation.value = ''
   sortField.value = ''
   sortOrder.value = 'asc'
+  currentPage.value = 1
 }
 
 function closeModal() {

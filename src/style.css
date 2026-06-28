@@ -286,3 +286,23 @@ code {
     border-right-color: var(--border);
   }
 }
+
+/* ===== 分页组件 ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+}
+
+.page-info {
+  font-size: 14px;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+.btn-page {
+  min-width: 80px;
+}

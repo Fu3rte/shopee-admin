@@ -36,7 +36,7 @@
             <tr v-if="filteredCustomers.length === 0">
               <td colspan="6" class="empty-row">暂无数据</td>
             </tr>
-            <tr v-for="item in filteredCustomers" :key="item.id">
+            <tr v-for="item in pagedCustomers" :key="item.id">
               <td>{{ item.name }}</td>
               <td>{{ item.phone }}</td>
               <td>{{ item.address }}</td>
@@ -51,6 +51,12 @@
         </table>
       </div>
 
+      <!-- 分页 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+        <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
+        <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
+      </div>
     </div>
 
     <!-- Modal 弹窗：添加/修改客户 -->
@@ -106,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { getCustomers, saveCustomers, getUsers } from '../utils/storage.js'
 
 /* ===== 当前用户 ===== */
@@ -131,6 +137,17 @@ const businessEmployees = computed(() =>
 )
 const searchKeyword = ref('')
 const filterSalesperson = ref('')
+
+/* ===== 分页 ===== */
+const pageSize = 10
+const currentPage = ref(1)
+
+const pagedCustomers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredCustomers.value.slice(start, start + pageSize)
+})
+const totalPages = computed(() => Math.ceil(filteredCustomers.value.length / pageSize) || 1)
+
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -191,6 +208,18 @@ function loadCustomers() {
 
 function loadEmployees() {
   allEmployees.value = getUsers()
+}
+
+// 筛选条件变化时回到第一页
+watch([searchKeyword, filterSalesperson], () => {
+  currentPage.value = 1
+})
+
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
 /* ---- 添加 ---- */

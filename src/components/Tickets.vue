@@ -35,7 +35,7 @@
             <tr v-if="filteredTickets.length === 0">
               <td colspan="5" class="empty-row">暂无数据</td>
             </tr>
-            <tr v-for="item in filteredTickets" :key="item.id">
+            <tr v-for="item in pagedTickets" :key="item.id">
               <td>{{ item.customerName }}</td>
               <td>{{ item.feedback }}</td>
               <td><span :class="'status-tag status-' + (item.status || '待处理').toLowerCase()">{{ item.status || '待处理' }}</span></td>
@@ -48,6 +48,13 @@
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination" v-if="totalPages > 1">
+      <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+      <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
+      <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
     </div>
 
     <!-- Modal 弹窗：添加/修改售后单 -->
@@ -111,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { getTickets, saveTickets, getCustomers, getUsers } from '../utils/storage.js'
 
 // 当前用户
@@ -131,6 +138,16 @@ const tickets = ref([])       // 当前角色可见的售后单
 const searchKeyword = ref('')
 const filterSalesperson = ref('')
 const showModal = ref(false)
+
+/* ===== 分页 ===== */
+const pageSize = 10
+const currentPage = ref(1)
+
+const pagedTickets = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredTickets.value.slice(start, start + pageSize)
+})
+const totalPages = computed(() => Math.ceil(filteredTickets.value.length / pageSize) || 1)
 const isEditing = ref(false)
 const editingId = ref(null)
 
@@ -205,6 +222,18 @@ function loadAllCustomers() {
 
 function loadEmployees() {
   allEmployees.value = getUsers()
+}
+
+// 筛选条件变化时回到第一页
+watch([searchKeyword, filterSalesperson], () => {
+  currentPage.value = 1
+})
+
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
 /* ---- 添加 ---- */

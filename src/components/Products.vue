@@ -41,7 +41,7 @@
             <tr v-if="filteredProducts.length === 0">
               <td colspan="5" class="empty-row">暂无数据</td>
             </tr>
-            <tr v-for="item in filteredProducts" :key="item.id">
+            <tr v-for="item in pagedProducts" :key="item.id">
               <td>{{ item.name }}</td>
               <td>{{ item.type }}</td>
               <td>{{ item.quantity }}</td>
@@ -53,6 +53,13 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- 分页 -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+        <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
+        <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
       </div>
     </div>
 
@@ -95,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { getProducts, saveProducts } from '../utils/storage.js'
 
 const products = ref([])
@@ -103,6 +110,17 @@ const searchKeyword = ref('')
 const filterType = ref('')
 const sortField = ref('')
 const sortOrder = ref('asc')
+
+/* ===== 分页 ===== */
+const pageSize = 10
+const currentPage = ref(1)
+
+const pagedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return filteredProducts.value.slice(start, start + pageSize)
+})
+const totalPages = computed(() => Math.ceil(filteredProducts.value.length / pageSize) || 1)
+
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -164,6 +182,18 @@ onMounted(() => {
 /* ===== 方法 ===== */
 function loadProducts() {
   products.value = getProducts()
+}
+
+// 筛选条件变化时回到第一页
+watch([searchKeyword, filterType, sortField], () => {
+  currentPage.value = 1
+})
+
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
 /* ---- 添加 ---- */
