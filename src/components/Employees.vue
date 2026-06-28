@@ -218,16 +218,16 @@ function onDepartmentChange() {
 
 // 可选的部门列表（用于筛选下拉）
 const departmentList = computed(() => {
-  return [...new Set(employees.value.map(e => e.department).filter(Boolean))].sort()
+  return [...new Set(displayedEmployees.value.map(e => e.department).filter(Boolean))].sort()
 })
 
 // 可选的学历列表（用于筛选下拉）
 const educationList = computed(() => {
-  return [...new Set(employees.value.map(e => e.education).filter(Boolean))].sort()
+  return [...new Set(displayedEmployees.value.map(e => e.education).filter(Boolean))].sort()
 })
 
 const filteredEmployees = computed(() => {
-  let result = employees.value
+  let result = displayedEmployees.value
 
   // 按部门筛选
   if (filterDepartment.value) {
@@ -282,6 +282,11 @@ onMounted(() => {
 function loadEmployees() {
   employees.value = getUsers()
 }
+
+// 展示时过滤掉经理，防止被误删
+const displayedEmployees = computed(() => {
+  return employees.value.filter(u => u.position !== '经理')
+})
 
 /* ---- 添加 ---- */
 function openAddModal() {
