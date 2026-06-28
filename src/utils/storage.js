@@ -23,7 +23,7 @@ const DEFAULT_ADMIN = [
     education: '本科',
     department: '管理部',
     hireDate: '2026-01-01',
-    position: '系统管理员',
+    position: '经理',
     salary: 15000
   }
 ]

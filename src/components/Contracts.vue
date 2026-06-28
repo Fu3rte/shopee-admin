@@ -250,11 +250,18 @@ function sortBy(field) {
 
 // 根据日期计算合同状态
 function getContractStatus(item) {
-  if (!item.expiryDate) return '生效中'
   const now = new Date()
-  const expiry = new Date(item.expiryDate)
-  // 把时间归零到当天0点，比较日期
   now.setHours(0, 0, 0, 0)
+
+  // 未生效：生效日期在将来
+  if (item.startDate) {
+    const start = new Date(item.startDate)
+    start.setHours(0, 0, 0, 0)
+    if (start > now) return '未生效'
+  }
+
+  if (!item.expiryDate) return '生效中'
+  const expiry = new Date(item.expiryDate)
   expiry.setHours(0, 0, 0, 0)
   return expiry < now ? '已过期' : '生效中'
 }

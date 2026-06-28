@@ -137,14 +137,9 @@ const editingId = ref(null)
 // 全部客户（下拉框用）
 const allCustomers = ref([])
 
-// 可选客户（过滤掉已有售后单的客户，使用全局列表判断）
+// 可选客户（不过滤已有售后单的客户，允许多条工单）
 const availableCustomers = computed(() => {
-  const assignedNames = new Set(allTickets.value.map(t => t.customerName))
-  // 编辑模式下，当前客户仍需可选
-  if (isEditing.value && form.value.customerName) {
-    assignedNames.delete(form.value.customerName)
-  }
-  return allCustomers.value.filter(c => !assignedNames.has(c.name))
+  return allCustomers.value
 })
 
 // 所有员工（管理员分配业务员用）
@@ -261,16 +256,8 @@ function saveTicket() {
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（输入客户姓名确认） ---- */
+/* ---- 删除（直接删除，无需确认） ---- */
 function confirmDelete(item) {
-  const input = prompt(`确定要删除「${item.customerName}」的售后信息吗？请输入客户姓名以确认删除对应售后信息：`)
-  if (input === null) return
-
-  if (input.trim() !== item.customerName) {
-    alert('客户姓名输入不匹配，取消删除')
-    return
-  }
-
   allTickets.value = allTickets.value.filter(t => t.id !== item.id)
   saveTickets(allTickets.value)
   loadTickets()
