@@ -86,7 +86,7 @@
               </div>
             </template>
             <div v-else class="form-group">
-              <label>售后员（自动带出）</label>
+              <label>售后员</label>
               <input type="text" :value="form.salesperson" disabled class="auto-field" />
             </div>
           </div>
