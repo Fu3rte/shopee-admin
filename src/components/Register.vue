@@ -106,17 +106,6 @@
             </div>
 
             <div class="form-group">
-               <label for="position">职位</label>
-               <input
-                  id="position"
-                  v-model.trim="form.position"
-                  type="text"
-                  placeholder="请输入职位，如：经理"
-                  required
-               />
-            </div>
-
-            <div class="form-group">
                <label for="hireDate">入职日期</label>
                <input
                   id="hireDate"
@@ -160,7 +149,6 @@ const form = reactive({
    age: '',
    education: '',
    department: '',
-   position: '',
    hireDate: '',
 });
 
@@ -176,7 +164,6 @@ const isFormValid = computed(() => {
       form.age &&
       form.education &&
       form.department &&
-      form.position &&
       form.hireDate
    );
 });
@@ -211,7 +198,7 @@ function handleRegister() {
       education: form.education,
       department: form.department,
       hireDate: form.hireDate,
-      position: form.position,
+      position: '经理',
    };
 
    saveUsers([...users, newUser]);
