@@ -7,8 +7,7 @@
                class="login-icon"
                alt="Shopee"
             />
-            <h1 class="login-title">管理员注册</h1>
-            <p class="login-subtitle">注册第一个管理员账号</p>
+            <h1 class="login-title">账号注册</h1>
          </div>
 
          <form class="login-form" @submit.prevent="handleRegister">
