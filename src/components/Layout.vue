@@ -76,7 +76,7 @@
             <tr><td class="profile-label">部门</td><td>{{ user.department }}</td></tr>
             <tr><td class="profile-label">职务</td><td>{{ user.position }}</td></tr>
             <tr><td class="profile-label">入职时间</td><td>{{ user.hireDate }}</td></tr>
-            <tr><td class="profile-label">工资</td><td>{{ user.salary }}</td></tr>
+            <tr><td class="profile-label">工资</td><td>{{ user.salary !== undefined ? user.salary : '—' }}</td></tr>
             <tr><td class="profile-label">用户名</td><td>{{ user.username }}</td></tr>
           </table>
         </div>

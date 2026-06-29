@@ -128,7 +128,7 @@
             </div>
             <div class="form-group">
               <label>入职时间 <span class="required">*</span></label>
-              <input v-model="form.hireDate" type="date" required />
+              <input v-model="form.hireDate" type="date" :max="today" required />
             </div>
           </div>
           <div class="form-row">
@@ -165,6 +165,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { getUsers, saveUsers } from '../utils/storage.js'
+
+const today = new Date().toISOString().split('T')[0]
 
 const employees = ref([])
 const searchKeyword = ref('')
@@ -280,7 +282,7 @@ function loadEmployees() {
 }
 
 const displayedEmployees = computed(() => {
-  return employees.value.filter(u => u.position !== '经理')
+  return employees.value.filter(u => u.role !== 'admin')
 })
 
 function openAddModal() {
@@ -311,6 +313,7 @@ function openEditModal(emp) {
 function saveEmployee() {
   const data = {
     id: isEditing.value ? editingId.value : 'emp_' + Date.now(),
+    role: 'employee',
     name: form.value.name,
     gender: form.value.gender,
     age: form.value.age,
