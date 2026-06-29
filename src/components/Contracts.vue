@@ -137,9 +137,7 @@ import { getContracts, saveContracts, getCustomers, getUsers } from '../utils/st
 
 // 当前用户
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = userStr ? JSON.parse(userStr) : null
-
-const currentUser = currentUserData
+const currentUser = userStr ? JSON.parse(userStr) : null
 const isAdmin = currentUser?.department === '管理部'
 
 const allContracts = ref([])

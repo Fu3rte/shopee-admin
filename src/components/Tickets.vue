@@ -48,12 +48,12 @@
           </tbody>
         </table>
       </div>
-    </div>
 
-    <div class="pagination" v-if="totalPages > 1">
-      <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
-      <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
-      <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+        <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
+        <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
+      </div>
     </div>
 
     <!-- 添加/修改售后单 -->
@@ -69,7 +69,7 @@
               <label>客户姓名 <span class="required">*</span></label>
               <select v-model="form.customerName" required>
                 <option value="">请选择客户</option>
-                <option v-for="c in availableCustomers" :key="c.id" :value="c.name">
+                <option v-for="c in allCustomers" :key="c.id" :value="c.name">
                   {{ c.name }}
                 </option>
               </select>
@@ -122,9 +122,7 @@ import { getTickets, saveTickets, getCustomers, getUsers } from '../utils/storag
 
 // 当前用户
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = userStr ? JSON.parse(userStr) : null
-
-const currentUser = currentUserData
+const currentUser = userStr ? JSON.parse(userStr) : null
 const isAdmin = currentUser?.department === '管理部'
 
 const allTickets = ref([])    // 全部售后单
@@ -146,11 +144,6 @@ const editingId = ref(null)
 
 // 全部客户
 const allCustomers = ref([])
-
-// 可选客户
-const availableCustomers = computed(() => {
-  return allCustomers.value
-})
 
 // 所有员工
 const allEmployees = ref([])
@@ -280,6 +273,14 @@ function saveTicket() {
 }
 
 function confirmDelete(item) {
+  const input = prompt(`确定要删除售后单「${item.customerName}」吗？请输入该客户姓名确认：`)
+  if (input === null) return
+
+  if (input.trim() !== item.customerName) {
+    alert('客户姓名输入不匹配，取消删除')
+    return
+  }
+
   allTickets.value = allTickets.value.filter(t => t.id !== item.id)
   saveTickets(allTickets.value)
   loadTickets()

@@ -30,6 +30,28 @@ function saveData(key, data) {
 
 /* ===== 用户 ===== */
 
+/** 初始化默认账号（首次使用时写入一个默认经理账号） */
+export function initDefaultData() {
+  const users = loadData(USERS_KEY)
+  if (users.length === 0) {
+    const defaultUser = {
+      id: 'default_admin',
+      username: 'admin',
+      password: 'admin123',
+      role: 'admin',
+      name: '管理员',
+      gender: '男',
+      age: 30,
+      education: '本科',
+      department: '管理部',
+      hireDate: '2024-01-01',
+      position: '经理',
+      salary: 20000
+    }
+    saveData(USERS_KEY, [defaultUser])
+  }
+}
+
 export function getUsers() {
   return loadData(USERS_KEY)
 }

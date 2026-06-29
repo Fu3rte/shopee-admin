@@ -36,11 +36,6 @@
       </form>
 
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
-
-      <p class="register-link">
-        没有账号？
-        <router-link to="/register">立即注册</router-link>
-      </p>
     </div>
   </div>
 </template>

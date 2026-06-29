@@ -44,11 +44,6 @@ const routes = [
       }
     ]
   },
-  {
-    path: '/register',
-    name: 'Register',
-    component: () => import('@/components/Register.vue')
-  }
 ]
 
 const router = createRouter({
@@ -60,11 +55,11 @@ router.beforeEach((to, from, next) => {
   const userStr = localStorage.getItem('shopee_current_user')
   const isLoggedIn = !!userStr
 
-  if (!isLoggedIn && to.path !== '/login' && to.path !== '/register') {
+  if (!isLoggedIn && to.path !== '/login') {
     return next('/login')
   }
 
-  if (isLoggedIn && (to.path === '/login' || to.path === '/register')) {
+  if (isLoggedIn && to.path === '/login') {
     try {
       const user = JSON.parse(userStr)
       const departmentRouteMap = {

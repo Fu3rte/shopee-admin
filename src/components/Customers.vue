@@ -116,9 +116,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { getCustomers, saveCustomers, getUsers } from '../utils/storage.js'
 
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = userStr ? JSON.parse(userStr) : null
-
-const currentUser = currentUserData
+const currentUser = userStr ? JSON.parse(userStr) : null
 const isAdmin = currentUser?.department === '管理部'
 
 const allCustomers = ref([])   // 全部客户
