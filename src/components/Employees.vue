@@ -70,7 +70,6 @@
         </table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination" v-if="totalPages > 1">
         <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
         <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
@@ -78,7 +77,6 @@
       </div>
     </div>
 
-    <!-- Modal 添加/修改员工 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -175,7 +173,6 @@ const filterEducation = ref('')
 const sortField = ref('')
 const sortOrder = ref('asc')
 
-/* ===== 分页 ===== */
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -204,7 +201,6 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
-// 部门 → 职务自动映射
 const departmentPositionMap = {
   '管理部': '系统管理员',
   '业务部': '跨境业务员',
@@ -216,12 +212,12 @@ function onDepartmentChange() {
   form.value.position = departmentPositionMap[form.value.department] || ''
 }
 
-// 可选的部门列表（用于筛选下拉）
+// 可选的部门列表
 const departmentList = computed(() => {
   return [...new Set(displayedEmployees.value.map(e => e.department).filter(Boolean))].sort()
 })
 
-// 可选的学历列表（用于筛选下拉）
+// 可选的学历列表
 const educationList = computed(() => {
   return [...new Set(displayedEmployees.value.map(e => e.education).filter(Boolean))].sort()
 })
@@ -283,12 +279,10 @@ function loadEmployees() {
   employees.value = getUsers()
 }
 
-// 展示时过滤掉经理，防止被误删
 const displayedEmployees = computed(() => {
   return employees.value.filter(u => u.position !== '经理')
 })
 
-/* ---- 添加 ---- */
 function openAddModal() {
   isEditing.value = false
   editingId.value = null
@@ -296,7 +290,6 @@ function openAddModal() {
   showModal.value = true
 }
 
-/* ---- 修改 ---- */
 function openEditModal(emp) {
   isEditing.value = true
   editingId.value = emp.id
@@ -315,7 +308,6 @@ function openEditModal(emp) {
   showModal.value = true
 }
 
-/* ---- 保存 ---- */
 function saveEmployee() {
   const data = {
     id: isEditing.value ? editingId.value : 'emp_' + Date.now(),
@@ -337,7 +329,6 @@ function saveEmployee() {
       employees.value[index] = data
     }
   } else {
-    // 检查用户名是否已存在
     if (employees.value.some(e => e.username === data.username)) {
       alert('该用户名已被使用，请更换')
       return
@@ -350,7 +341,6 @@ function saveEmployee() {
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（输入员工姓名确认） ---- */
 function confirmDelete(emp) {
   const input = prompt(`确定要删除员工「${emp.name}」吗？请输入该员工姓名确认：`)
   if (input === null) return
@@ -365,12 +355,10 @@ function confirmDelete(emp) {
   alert('删除成功')
 }
 
-// 筛选条件变化时回到第一页
 watch([searchKeyword, filterDepartment, filterEducation, sortField], () => {
   currentPage.value = 1
 })
 
-// 数据变化时确保 currentPage 不越界
 watch(totalPages, (newTotal) => {
   if (currentPage.value > newTotal) {
     currentPage.value = newTotal
@@ -384,7 +372,6 @@ function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/* ---- 重置搜索与筛选 ---- */
 function resetSearch() {
   searchKeyword.value = ''
   filterDepartment.value = ''

@@ -50,14 +50,13 @@
       </div>
     </div>
 
-    <!-- 分页 -->
     <div class="pagination" v-if="totalPages > 1">
       <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
       <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
       <button class="btn btn-default btn-page" :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
     </div>
 
-    <!-- Modal 弹窗：添加/修改售后单 -->
+    <!-- 添加/修改售后单 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -123,23 +122,17 @@ import { getTickets, saveTickets, getCustomers, getUsers } from '../utils/storag
 
 // 当前用户
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = null
-try {
-  currentUserData = userStr ? JSON.parse(userStr) : null
-} catch (e) {
-  currentUserData = null
-}
+let currentUserData = userStr ? JSON.parse(userStr) : null
+
 const currentUser = currentUserData
 const isAdmin = currentUser?.department === '管理部'
 
-/* ===== 数据 ===== */
-const allTickets = ref([])    // 全部售后单（用于保存时写回完整列表）
+const allTickets = ref([])    // 全部售后单
 const tickets = ref([])       // 当前角色可见的售后单
 const searchKeyword = ref('')
 const filterSalesperson = ref('')
 const showModal = ref(false)
 
-/* ===== 分页 ===== */
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -151,15 +144,15 @@ const totalPages = computed(() => Math.ceil(filteredTickets.value.length / pageS
 const isEditing = ref(false)
 const editingId = ref(null)
 
-// 全部客户（下拉框用）
+// 全部客户
 const allCustomers = ref([])
 
-// 可选客户（不过滤已有售后单的客户，允许多条工单）
+// 可选客户
 const availableCustomers = computed(() => {
   return allCustomers.value
 })
 
-// 所有员工（管理员分配业务员用）
+// 所有员工
 const allEmployees = ref([])
 const serviceEmployees = computed(() =>
   allEmployees.value.filter(e => e.department === '售后部')
@@ -174,7 +167,7 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
-// 可选的业务员列表（用于筛选下拉）
+// 可选的业务员列表
 const salespersonList = computed(() => {
   const names = [...new Set(tickets.value.map(t => t.salesperson).filter(Boolean))]
   return names.sort()
@@ -203,7 +196,6 @@ onMounted(() => {
   loadEmployees()
 })
 
-/* ===== 方法 ===== */
 function loadTickets() {
   const all = getTickets()
   allTickets.value = all
@@ -224,12 +216,10 @@ function loadEmployees() {
   allEmployees.value = getUsers()
 }
 
-// 筛选条件变化时回到第一页
 watch([searchKeyword, filterSalesperson], () => {
   currentPage.value = 1
 })
 
-// 数据变化时确保 currentPage 不越界
 watch(totalPages, (newTotal) => {
   if (currentPage.value > newTotal) {
     currentPage.value = newTotal
@@ -243,7 +233,6 @@ function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/* ---- 添加 ---- */
 function openAddModal() {
   isEditing.value = false
   editingId.value = null
@@ -254,7 +243,6 @@ function openAddModal() {
   showModal.value = true
 }
 
-/* ---- 修改 ---- */
 function openEditModal(item) {
   isEditing.value = true
   editingId.value = item.id
@@ -267,7 +255,6 @@ function openEditModal(item) {
   showModal.value = true
 }
 
-/* ---- 保存 ---- */
 function saveTicket() {
   const data = {
     id: isEditing.value ? editingId.value : 'tkt_' + Date.now(),
@@ -292,7 +279,6 @@ function saveTicket() {
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（直接删除，无需确认） ---- */
 function confirmDelete(item) {
   allTickets.value = allTickets.value.filter(t => t.id !== item.id)
   saveTickets(allTickets.value)
@@ -300,7 +286,6 @@ function confirmDelete(item) {
   alert('删除成功')
 }
 
-/* ---- 重置搜索与筛选 ---- */
 function resetSearch() {
   searchKeyword.value = ''
   filterSalesperson.value = ''

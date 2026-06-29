@@ -51,7 +51,6 @@ const username = ref('')
 const password = ref('')
 const errorMsg = ref('')
 
-// 部门 → 首选项页面
 const departmentRouteMap = {
   '管理部': '/employees',
   '业务部': '/customers',

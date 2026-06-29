@@ -55,7 +55,6 @@
         </table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination" v-if="totalPages > 1">
         <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
         <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
@@ -63,7 +62,7 @@
       </div>
     </div>
 
-    <!-- Modal 弹窗：添加/修改产品 -->
+    <!-- 添加/修改产品 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -111,7 +110,6 @@ const filterType = ref('')
 const sortField = ref('')
 const sortOrder = ref('asc')
 
-/* ===== 分页 ===== */
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -134,7 +132,7 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
-// 可选的类型列表（用于筛选下拉）
+// 可选的类型列表
 const typeList = computed(() => {
   return [...new Set(products.value.map(p => p.type).filter(Boolean))].sort()
 })
@@ -179,17 +177,14 @@ onMounted(() => {
   loadProducts()
 })
 
-/* ===== 方法 ===== */
 function loadProducts() {
   products.value = getProducts()
 }
 
-// 筛选条件变化时回到第一页
 watch([searchKeyword, filterType, sortField], () => {
   currentPage.value = 1
 })
 
-// 数据变化时确保 currentPage 不越界
 watch(totalPages, (newTotal) => {
   if (currentPage.value > newTotal) {
     currentPage.value = newTotal
@@ -203,7 +198,6 @@ function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/* ---- 添加 ---- */
 function openAddModal() {
   isEditing.value = false
   editingId.value = null
@@ -211,7 +205,6 @@ function openAddModal() {
   showModal.value = true
 }
 
-/* ---- 修改 ---- */
 function openEditModal(item) {
   isEditing.value = true
   editingId.value = item.id
@@ -224,7 +217,6 @@ function openEditModal(item) {
   showModal.value = true
 }
 
-/* ---- 保存 ---- */
 function saveProduct() {
   const data = {
     id: isEditing.value ? editingId.value : 'prod_' + Date.now(),
@@ -248,7 +240,6 @@ function saveProduct() {
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（输入产品名称确认） ---- */
 function confirmDelete(item) {
   const input = prompt(`确定要删除产品「${item.name}」吗？请输入该产品名称确认：`)
   if (input === null) return
@@ -263,7 +254,6 @@ function confirmDelete(item) {
   alert('删除成功')
 }
 
-/* ---- 重置搜索 ---- */
 function resetSearch() {
   searchKeyword.value = ''
   filterType.value = ''

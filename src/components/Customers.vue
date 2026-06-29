@@ -28,7 +28,7 @@
               <th>联系电话</th>
               <th>收货地址</th>
               <th>电子邮箱</th>
-              <th>跟进业务员</th>
+              <th>业务员</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -59,7 +59,7 @@
       </div>
     </div>
 
-    <!-- Modal 弹窗：添加/修改客户 -->
+    <!-- 添加/修改客户 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -115,22 +115,16 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getCustomers, saveCustomers, getUsers } from '../utils/storage.js'
 
-/* ===== 当前用户 ===== */
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = null
-try {
-  currentUserData = userStr ? JSON.parse(userStr) : null
-} catch (e) {
-  currentUserData = null
-}
+let currentUserData = userStr ? JSON.parse(userStr) : null
+
 const currentUser = currentUserData
 const isAdmin = currentUser?.department === '管理部'
 
-/* ===== 数据 ===== */
-const allCustomers = ref([])   // 全部客户（用于保存时写回完整列表）
+const allCustomers = ref([])   // 全部客户
 const displayedCustomers = ref([])  // 当前业务员可见的客户
 
-// 所有员工（管理员分配业务员用）
+// 所有员工
 const allEmployees = ref([])
 const businessEmployees = computed(() =>
   allEmployees.value.filter(e => e.department === '业务部')
@@ -138,7 +132,6 @@ const businessEmployees = computed(() =>
 const searchKeyword = ref('')
 const filterSalesperson = ref('')
 
-/* ===== 分页 ===== */
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -162,13 +155,12 @@ const defaultForm = () => ({
 
 const form = ref(defaultForm())
 
-// 可选的业务员列表（用于筛选下拉）
+// 可选的业务员列表
 const salespersonList = computed(() => {
   const names = [...new Set(displayedCustomers.value.map(c => c.salesperson).filter(Boolean))]
   return names.sort()
 })
 
-/* ===== 计算属性 ===== */
 const filteredCustomers = computed(() => {
   let result = displayedCustomers.value
 
@@ -186,17 +178,15 @@ const filteredCustomers = computed(() => {
   return result
 })
 
-/* ===== 生命周期 ===== */
 onMounted(() => {
   loadCustomers()
   loadEmployees()
 })
 
-/* ===== 方法 ===== */
 function loadCustomers() {
   const all = getCustomers()
   allCustomers.value = all
-  // 行级数据隔离：管理员可见全部，普通员工仅显示自己跟进的客户
+
   if (isAdmin) {
     displayedCustomers.value = all
   } else if (currentUser) {
@@ -210,12 +200,10 @@ function loadEmployees() {
   allEmployees.value = getUsers()
 }
 
-// 筛选条件变化时回到第一页
 watch([searchKeyword, filterSalesperson], () => {
   currentPage.value = 1
 })
 
-// 数据变化时确保 currentPage 不越界
 watch(totalPages, (newTotal) => {
   if (currentPage.value > newTotal) {
     currentPage.value = newTotal
@@ -229,7 +217,6 @@ function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/* ---- 添加 ---- */
 function openAddModal() {
   isEditing.value = false
   editingId.value = null
@@ -240,7 +227,6 @@ function openAddModal() {
   showModal.value = true
 }
 
-/* ---- 修改 ---- */
 function openEditModal(item) {
   isEditing.value = true
   editingId.value = item.id
@@ -254,7 +240,6 @@ function openEditModal(item) {
   showModal.value = true
 }
 
-/* ---- 保存 ---- */
 function saveCustomer() {
   const data = {
     id: isEditing.value ? editingId.value : 'cust_' + Date.now(),
@@ -266,7 +251,6 @@ function saveCustomer() {
   }
 
   if (isEditing.value) {
-    // 修改：在全部客户列表中定位并更新
     const index = allCustomers.value.findIndex(c => c.id === editingId.value)
     if (index !== -1) {
       allCustomers.value[index] = data
@@ -276,13 +260,11 @@ function saveCustomer() {
   }
 
   saveCustomers(allCustomers.value)
-  // 刷新当前视图
   loadCustomers()
   showModal.value = false
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（需输入客户姓名确认） ---- */
 function confirmDelete(item) {
   const input = prompt(`确定要删除客户「${item.name}」吗？请输入该客户姓名确认：`)
   if (input === null) return
@@ -292,14 +274,12 @@ function confirmDelete(item) {
     return
   }
 
-  // 从全部列表中删除
   allCustomers.value = allCustomers.value.filter(c => c.id !== item.id)
   saveCustomers(allCustomers.value)
   loadCustomers()
   alert('删除成功')
 }
 
-/* ---- 重置搜索与筛选 ---- */
 function resetSearch() {
   searchKeyword.value = ''
   filterSalesperson.value = ''

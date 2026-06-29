@@ -1,4 +1,3 @@
-// Vue Router 4 + Hash 模式 + 全局路由守卫
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
@@ -52,7 +51,6 @@ const router = createRouter({
   routes
 })
 
-// 全局前置守卫：未登录跳转 /login，角色不匹配弹窗拦截
 router.beforeEach((to, from, next) => {
   const userStr = localStorage.getItem('shopee_current_user')
   const isLoggedIn = !!userStr
@@ -62,7 +60,6 @@ router.beforeEach((to, from, next) => {
   }
 
   if (isLoggedIn && to.path === '/login') {
-    // 根据用户部门跳转对应首页，而非固定 /employees（避免非管理部用户循环）
     try {
       const user = JSON.parse(userStr)
       const departmentRouteMap = {

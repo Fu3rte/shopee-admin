@@ -93,12 +93,8 @@ const router = useRouter()
 const route = useRoute()
 
 const userStr = localStorage.getItem('shopee_current_user')
-let userData = {}
-try {
-  userData = userStr ? JSON.parse(userStr) : {}
-} catch (e) {
-  userData = {}
-}
+let userData = userStr ? JSON.parse(userStr) : {}
+
 const user = ref(userData)
 const showProfile = ref(false)
 

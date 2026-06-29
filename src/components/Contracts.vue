@@ -61,7 +61,6 @@
         </table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination" v-if="totalPages > 1">
         <button class="btn btn-default btn-page" :disabled="currentPage <= 1" @click="prevPage">上一页</button>
         <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
@@ -69,7 +68,7 @@
       </div>
     </div>
 
-    <!-- Modal 弹窗：添加/修改合同 -->
+    <!-- 添加/修改合同 -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
@@ -138,16 +137,11 @@ import { getContracts, saveContracts, getCustomers, getUsers } from '../utils/st
 
 // 当前用户
 const userStr = localStorage.getItem('shopee_current_user')
-let currentUserData = null
-try {
-  currentUserData = userStr ? JSON.parse(userStr) : null
-} catch (e) {
-  currentUserData = null
-}
+let currentUserData = userStr ? JSON.parse(userStr) : null
+
 const currentUser = currentUserData
 const isAdmin = currentUser?.department === '管理部'
 
-/* ===== 数据 ===== */
 const allContracts = ref([])
 const displayedContracts = ref([])
 const searchKeyword = ref('')
@@ -156,7 +150,6 @@ const sortField = ref('')
 const sortOrder = ref('asc')
 const showModal = ref(false)
 
-/* ===== 分页 ===== */
 const pageSize = 10
 const currentPage = ref(1)
 
@@ -168,16 +161,16 @@ const totalPages = computed(() => Math.ceil(filteredContracts.value.length / pag
 const isEditing = ref(false)
 const editingId = ref(null)
 
-// 当前业务员的客户（下拉框用）
+// 当前业务员的客户
 const myCustomers = ref([])
 
-// 可选的业务员列表（用于筛选下拉）
+// 可选的业务员列表
 const salespersonList = computed(() => {
   const names = [...new Set(displayedContracts.value.map(c => c.salesperson).filter(Boolean))]
   return names.sort()
 })
 
-// 所有员工（管理员分配业务员用）
+// 所有员工
 const allEmployees = ref([])
 const businessEmployees = computed(() =>
   allEmployees.value.filter(e => e.department === '业务部')
@@ -226,7 +219,6 @@ onMounted(() => {
   loadEmployees()
 })
 
-/* ===== 方法 ===== */
 function loadContracts() {
   const all = getContracts()
   allContracts.value = all
@@ -269,7 +261,6 @@ function getContractStatus(item) {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
 
-  // 未生效：生效日期在将来
   if (item.startDate) {
     const start = new Date(item.startDate)
     start.setHours(0, 0, 0, 0)
@@ -282,12 +273,10 @@ function getContractStatus(item) {
   return expiry < now ? '已过期' : '生效中'
 }
 
-// 筛选条件变化时回到第一页
 watch([searchKeyword, filterSalesperson, sortField], () => {
   currentPage.value = 1
 })
 
-// 数据变化时确保 currentPage 不越界
 watch(totalPages, (newTotal) => {
   if (currentPage.value > newTotal) {
     currentPage.value = newTotal
@@ -301,7 +290,6 @@ function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/* ---- 添加 ---- */
 function openAddModal() {
   isEditing.value = false
   editingId.value = null
@@ -312,7 +300,6 @@ function openAddModal() {
   showModal.value = true
 }
 
-/* ---- 修改 ---- */
 function openEditModal(item) {
   isEditing.value = true
   editingId.value = item.id
@@ -327,9 +314,7 @@ function openEditModal(item) {
   showModal.value = true
 }
 
-/* ---- 保存 ---- */
 function saveContract() {
-  // 校验：失效日期不能早于生效日期
   if (form.value.expiryDate && form.value.startDate && form.value.expiryDate < form.value.startDate) {
     alert('合同失效日期不能早于生效日期，请重新选择')
     return
@@ -360,7 +345,6 @@ function saveContract() {
   alert(isEditing.value ? '修改成功' : '添加成功')
 }
 
-/* ---- 删除（输入合同名称确认） ---- */
 function confirmDelete(item) {
   const input = prompt(`确定要删除合同「${item.name}」吗？请输入该合同名称确认：`)
   if (input === null) return
@@ -376,7 +360,6 @@ function confirmDelete(item) {
   alert('删除成功')
 }
 
-/* ---- 重置搜索与筛选 ---- */
 function resetSearch() {
   searchKeyword.value = ''
   filterSalesperson.value = ''
