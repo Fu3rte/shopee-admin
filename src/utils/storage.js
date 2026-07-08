@@ -26,7 +26,7 @@ export function initDefaultData() {
    const users = loadData(USERS_KEY);
    if (users.length === 0) {
       const defaultUser = {
-         id: 'default_admin',
+         id: '2026',
          username: 'admin',
          password: '123',
          role: 'admin',
@@ -35,7 +35,7 @@ export function initDefaultData() {
          age: 30,
          education: '本科',
          department: '管理部',
-         hireDate: '2024-01-01',
+         hireDate: '2026-06-06',
          position: '经理',
          salary: 20000,
       };
